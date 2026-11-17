@@ -75,7 +75,7 @@ function withLocalLock<T>(fn: () => Promise<T> | T): Promise<T> {
 
 function getInitialAdminUser(): AdminUser {
   const email = (process.env.ADMIN_EMAIL || 'admin@freshmart.pk').trim().toLowerCase();
-  const password = process.env.ADMIN_PASSWORD || 'FreshMart@2026';
+  const password = process.env.ADMIN_PASSWORD || 'Pak123@#';
   return {
     id: 'admin-freshmart-primary',
     email,
@@ -1098,6 +1098,27 @@ export const db = {
 
     const state = readLocalState();
     return state.admin_users.find((a) => a.email.toLowerCase() === clean && a.is_active) ?? null;
+  },
+
+  async updateAdminPassword(email: string, newPassword: string): Promise<void> {
+    const clean = email.trim().toLowerCase();
+    const newHash = hashPassword(newPassword);
+    if (isSupabaseConfigured()) {
+      const { error } = await getSupabase()
+        .from('admin_users')
+        .update({ password_hash: newHash })
+        .eq('email', clean);
+      if (error) throw new Error(error.message);
+      return;
+    }
+
+    await withLocalLock(() => {
+      const state = readLocalState();
+      const idx = state.admin_users.findIndex((a) => a.email.toLowerCase() === clean);
+      if (idx === -1) throw new Error('Admin user not found');
+      state.admin_users[idx].password_hash = newHash;
+      writeLocalState(state);
+    });
   },
 
   async createWhatsAppLog(log: Omit<WhatsAppLog, 'id' | 'created_at' | 'updated_at'>): Promise<WhatsAppLog> {

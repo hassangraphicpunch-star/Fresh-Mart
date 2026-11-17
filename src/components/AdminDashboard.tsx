@@ -155,6 +155,11 @@ export function AdminDashboard() {
   // Order Status Filter
   const [orderFilter, setOrderFilter] = useState<string>('all');
 
+  // Admin Password Change State
+  const [currentPasswordInput, setCurrentPasswordInput] = useState('');
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+
   const loadOverview = useCallback(async () => {
     try {
       setLoadingData(true);
@@ -1383,89 +1388,157 @@ export function AdminDashboard() {
 
               {/* STORE & AI SETTINGS */}
               {tab === 'settings' && (
-                <form
-                  onSubmit={handleSaveStoreSettings}
-                  className="bg-white border border-[#E4E6E0] rounded-xl p-6 space-y-4"
-                >
-                  <h2 className="font-display text-lg font-bold text-[#141715]">
-                    Fresh Mart Store & Gemini AI Settings
-                  </h2>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold mb-1">Store Helpline Phone</label>
-                      <input
-                        value={storePhone}
-                        onChange={(e) => setStorePhone(e.target.value)}
-                        className="w-full px-3 py-2 text-sm font-mono border border-[#D4D8D0] rounded-lg"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold mb-1">
-                        Owner WhatsApp Alert Number
-                      </label>
-                      <input
-                        value={whatsappPhone}
-                        onChange={(e) => setWhatsappPhone(e.target.value)}
-                        className="w-full px-3 py-2 text-sm font-mono border border-[#D4D8D0] rounded-lg"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-6">
-                    <label className="inline-flex items-center gap-2 text-xs font-semibold cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={aiEnabled}
-                        onChange={(e) => setAiEnabled(e.target.checked)}
-                      />
-                      <span>
-                        Enable Fresh Mart AI (Gemini:{' '}
-                        {data.systemStatus.geminiConfigured ? 'Key Loaded' : 'Needs GEMINI_API_KEY'})
-                      </span>
-                    </label>
-                    <label className="inline-flex items-center gap-2 text-xs font-semibold cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={whatsappNotifEnabled}
-                        onChange={(e) => setWhatsappNotifEnabled(e.target.checked)}
-                      />
-                      <span>Dispatch WhatsApp Notifications on Orders</span>
-                    </label>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold mb-1">
-                        Fresh Mart AI Welcome (English)
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={aiWelcomeEn}
-                        onChange={(e) => setAiWelcomeEn(e.target.value)}
-                        className="w-full px-3 py-2 text-xs border border-[#D4D8D0] rounded-lg"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold mb-1">
-                        Fresh Mart AI Welcome (Urdu)
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={aiWelcomeUr}
-                        onChange={(e) => setAiWelcomeUr(e.target.value)}
-                        className="w-full px-3 py-2 text-xs border border-[#D4D8D0] rounded-lg"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 rounded-lg bg-[#0F5132] text-white text-xs font-semibold cursor-pointer"
+                <div className="space-y-6">
+                  <form
+                    onSubmit={handleSaveStoreSettings}
+                    className="bg-white border border-[#E4E6E0] rounded-xl p-6 space-y-4"
                   >
-                    Save Store & AI Settings
-                  </button>
-                </form>
+                    <h2 className="font-display text-lg font-bold text-[#141715]">
+                      Fresh Mart Store & Gemini AI Settings
+                    </h2>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">Store Helpline Phone</label>
+                        <input
+                          value={storePhone}
+                          onChange={(e) => setStorePhone(e.target.value)}
+                          className="w-full px-3 py-2 text-sm font-mono border border-[#D4D8D0] rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">
+                          Owner WhatsApp Alert Number
+                        </label>
+                        <input
+                          value={whatsappPhone}
+                          onChange={(e) => setWhatsappPhone(e.target.value)}
+                          className="w-full px-3 py-2 text-sm font-mono border border-[#D4D8D0] rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-6">
+                      <label className="inline-flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={aiEnabled}
+                          onChange={(e) => setAiEnabled(e.target.checked)}
+                        />
+                        <span>
+                          Enable Fresh Mart AI (Gemini:{' '}
+                          {data.systemStatus.geminiConfigured ? 'Key Loaded' : 'Needs GEMINI_API_KEY'})
+                        </span>
+                      </label>
+                      <label className="inline-flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={whatsappNotifEnabled}
+                          onChange={(e) => setWhatsappNotifEnabled(e.target.checked)}
+                        />
+                        <span>Dispatch WhatsApp Notifications on Orders</span>
+                      </label>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">
+                          Fresh Mart AI Welcome (English)
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={aiWelcomeEn}
+                          onChange={(e) => setAiWelcomeEn(e.target.value)}
+                          className="w-full px-3 py-2 text-xs border border-[#D4D8D0] rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">
+                          Fresh Mart AI Welcome (Urdu)
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={aiWelcomeUr}
+                          onChange={(e) => setAiWelcomeUr(e.target.value)}
+                          className="w-full px-3 py-2 text-xs border border-[#D4D8D0] rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 rounded-lg bg-[#0F5132] text-white text-xs font-semibold cursor-pointer"
+                    >
+                      Save Store & AI Settings
+                    </button>
+                  </form>
+
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setChangingPassword(true);
+                      try {
+                        const res = await fetch('/api/admin/change-password', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            currentPassword: currentPasswordInput,
+                            newPassword: newPasswordInput,
+                          }),
+                        });
+                        const body = (await res.json()) as { error?: string };
+                        if (!res.ok) throw new Error(body.error || 'Password update failed');
+                        setCurrentPasswordInput('');
+                        setNewPasswordInput('');
+                        showToast('Admin password updated successfully.', 'success');
+                      } catch (err) {
+                        showToast(
+                          err instanceof Error ? err.message : 'Password update failed',
+                          'error'
+                        );
+                      } finally {
+                        setChangingPassword(false);
+                      }
+                    }}
+                    className="bg-white border border-[#E4E6E0] rounded-xl p-6 space-y-4"
+                  >
+                    <h3 className="font-display text-base font-bold text-[#141715]">
+                      Change Admin Password
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">Current Password</label>
+                        <input
+                          type="password"
+                          required
+                          value={currentPasswordInput}
+                          onChange={(e) => setCurrentPasswordInput(e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-[#D4D8D0] rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">
+                          New Password (min 6 chars)
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          minLength={6}
+                          value={newPasswordInput}
+                          onChange={(e) => setNewPasswordInput(e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-[#D4D8D0] rounded-lg"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={changingPassword}
+                      className="px-5 py-2.5 rounded-lg bg-[#141715] text-white text-xs font-semibold cursor-pointer disabled:opacity-60"
+                    >
+                      {changingPassword ? 'Updating...' : 'Update Admin Password'}
+                    </button>
+                  </form>
+                </div>
               )}
             </>
           )}

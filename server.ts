@@ -564,6 +564,34 @@ async function startServer() {
     });
   });
 
+  app.post('/api/admin/change-password', requireAdmin, async (req: AuthenticatedRequest, res) => {
+    try {
+      const body = req.body as { currentPassword?: string; newPassword?: string };
+      const currentPassword = body.currentPassword || '';
+      const newPassword = body.newPassword || '';
+
+      if (!currentPassword || newPassword.length < 6) {
+        res.status(400).json({
+          error: 'Current password is required and new password must be at least 6 characters.',
+        });
+        return;
+      }
+
+      const admin = await db.findAdminByEmail(req.adminSession!.email);
+      if (!admin || !verifyPassword(currentPassword, admin.password_hash)) {
+        res.status(401).json({ error: 'Current password is incorrect.' });
+        return;
+      }
+
+      await db.updateAdminPassword(admin.email, newPassword);
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({
+        error: err instanceof Error ? err.message : 'Failed to update admin password',
+      });
+    }
+  });
+
   // --------------------------------------------------------------------------
   // PROTECTED ADMIN ROUTES
   // --------------------------------------------------------------------------
