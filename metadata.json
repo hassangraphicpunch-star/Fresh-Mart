@@ -1,0 +1,8 @@
+{
+  "name": "Fresh Mart – Online Grocery Store",
+  "description": "Fresh Mart is a Karachi-based online grocery store offering farm-fresh produce, pantry staples, Cash on Delivery (COD), WhatsApp order updates, and Fresh Mart AI in English and Urdu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
